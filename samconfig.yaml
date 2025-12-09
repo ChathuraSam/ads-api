@@ -40,3 +40,19 @@ default:
     local_start_lambda:
         parameters:
             warm_containers: EAGER
+
+local:
+    build:
+        parameters:
+            parameter_overrides:
+                - Region=us-east-1
+                - Env=local
+    local_invoke:
+        parameters: env_vars = "env.vars-dev.json"
+
+dev:
+    deploy:
+        parameters:
+            parameter_overrides:
+                - Region=us-east-1
+                - Env=dev

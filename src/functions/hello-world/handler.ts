@@ -1,4 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { ENV } from '../../libs/constants';
 
 /**
  *
@@ -15,7 +16,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: 'hello world',
+                message: `hello world running in ${ENV}`,
             }),
         };
     } catch (err) {
