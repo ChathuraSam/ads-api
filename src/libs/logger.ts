@@ -1,8 +1,8 @@
 import pino from 'pino';
 import { LOG_LEVEL } from './constants';
 
-const logger = (name: string) => {
+const createLogger = (name: string) => {
     return pino({ name, level: LOG_LEVEL });
 };
 
-export default logger;
+export default createLogger;

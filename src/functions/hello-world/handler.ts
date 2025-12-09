@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { ENV } from '../../libs/constants';
+import createLogger from '../../libs/logger';
 
 /**
  *
@@ -11,7 +12,10 @@ import { ENV } from '../../libs/constants';
  *
  */
 
+const logger = createLogger('list-books');
+
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    logger.info({ event }, 'received event');
     try {
         return {
             statusCode: 200,
