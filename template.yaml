@@ -20,6 +20,11 @@ Globals:
                 AdsBucketName: !Sub '${AppCode}-${Env}-bucket-${AWS::AccountId}'
                 AdsTopicName: !Ref AdsTopicName
                 AdsTopicArn: !Ref AdsTopicArn
+    Api:
+        Auth:
+            Authorizers:
+                CognitoAuthorizer:
+                    UserPoolArn: !GetAtt UserPool.Arn
 
 Parameters:
     Env:
@@ -56,6 +61,9 @@ Resources:
                     Properties:
                         Path: /hello
                         Method: get
+                        Auth:
+                            Authorizer: CognitoAuthorizer
+
         Metadata: # Manage esbuild properties
             BuildMethod: esbuild
             BuildProperties:
@@ -113,6 +121,39 @@ Resources:
         Type: AWS::SNS::Topic
         Properties:
             TopicName: !Ref AdsTopicName
+
+    # Cognito User Pool
+    UserPool:
+        Type: AWS::Cognito::UserPool
+        Properties:
+            UserPoolName: !Sub '${AppCode}-${Env}-user-pool'
+            AutoVerifiedAttributes:
+                - email
+            UsernameAttributes:
+                - email
+            Policies:
+                PasswordPolicy:
+                    MinimumLength: 8
+                    RequireUppercase: true
+                    RequireLowercase: true
+                    RequireNumbers: true
+                    RequireSymbols: false
+            Schema:
+                - Name: email
+                  AttributeDataType: String
+                  Required: true
+                  Mutable: false
+
+    UserPoolClient:
+        Type: AWS::Cognito::UserPoolClient
+        Properties:
+            ClientName: !Sub '${AppCode}-${Env}-user-pool-client'
+            UserPoolId: !Ref UserPool
+            GenerateSecret: false
+            ExplicitAuthFlows:
+                - ALLOW_USER_PASSWORD_AUTH
+                - ALLOW_REFRESH_TOKEN_AUTH
+                - ALLOW_USER_SRP_AUTH
 
     # IAM Role
     AdsFunctionRole:
@@ -174,3 +215,12 @@ Outputs:
     HelloWorldFunctionIamRole:
         Description: Implicit IAM Role created for Hello World function
         Value: !GetAtt HelloWorldFunctionRole.Arn
+    UserPoolId:
+        Description: Cognito User Pool ID
+        Value: !Ref UserPool
+    UserPoolClientId:
+        Description: Cognito User Pool Client ID
+        Value: !Ref UserPoolClient
+    UserPoolArn:
+        Description: Cognito User Pool ARN
+        Value: !GetAtt UserPool.Arn

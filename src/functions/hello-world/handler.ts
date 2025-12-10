@@ -16,6 +16,8 @@ const logger = createLogger('hello-world');
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info({ event }, 'received event');
+    const userId = event.requestContext.authorizer?.claims?.sub || event.headers['X-User-Id'] || 'anonymous';
+    logger.info({ userId }, 'Creating ad for user');
     try {
         return {
             statusCode: 200,
