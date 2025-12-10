@@ -30,6 +30,7 @@ Parameters:
         Default: ads-api
 
 Resources:
+    # Lambda
     HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
@@ -66,11 +67,13 @@ Resources:
             Architectures:
                 - x86_64
             Events:
-                HelloWorld:
+                CreateAdApi:
                     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
                     Properties:
                         Path: /ads
                         Method: post
+                        Auth:
+                            Authorizer: AWS_IAM
         Metadata: # Manage esbuild properties
             BuildMethod: esbuild
             BuildProperties:
@@ -80,6 +83,7 @@ Resources:
                 EntryPoints:
                     - handler.ts
 
+    # DynamoDB
     AdsTable:
         Type: AWS::DynamoDB::Table
         Properties:
