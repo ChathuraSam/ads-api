@@ -1,6 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { ENV } from '../../libs/constants';
+import { v4 as uuidv4 } from 'uuid';
+import { ADS_TABLE_NAME, ENV } from '../../libs/constants';
 import createLogger from '../../libs/logger';
+import { createItem } from '../../services/dynamodb-service';
 
 /**
  *
@@ -16,21 +18,41 @@ const logger = createLogger('create-ads');
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info({ event }, 'received event');
-    const { title, description } = JSON.parse(event.body || '{}');
-    logger.info({ title, description }, 'ad data');
     try {
+        const { title, price, imageBase64 } = JSON.parse(event.body || '{}');
+
+        if (!title || !price) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'title and price are required' }),
+            };
+        }
+
+        const id = uuidv4();
+        const dateTime = new Date().toISOString();
+
+        // write the image upload code
+
+        const item = {
+            id,
+            title,
+            price,
+            // imageUrl,
+            createdAt: dateTime,
+        };
+
+        await createItem(ADS_TABLE_NAME, item);
+
         return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: `running ads API in ${ENV}`,
-            }),
+            statusCode: 201,
+            body: JSON.stringify({ message: 'Ad created', item }),
         };
     } catch (err) {
-        console.log(err);
+        logger.error({ err }, 'error creating ad');
         return {
             statusCode: 500,
             body: JSON.stringify({
-                message: 'some error happened',
+                message: 'some error happened while creating the ad',
             }),
         };
     }

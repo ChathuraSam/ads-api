@@ -53,7 +53,12 @@ local:
 dev:
     deploy:
         parameters:
+            stack_name: ads-api-dev
+            capabilities: CAPABILITY_IAM
+            confirm_changeset: true
+            resolve_s3: true
+            region: us-east-1
             parameter_overrides:
                 - Region=us-east-1
                 - Env=dev
-                - AdsTableName=AdsTableDev
+                - AdsTableName=AdsTable-dev

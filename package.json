@@ -19,7 +19,8 @@
         "@aws-sdk/client-dynamodb": "^3.948.0",
         "@aws-sdk/util-dynamodb": "^3.948.0",
         "esbuild": "^0.14.14",
-        "pino": "^10.1.0"
+        "pino": "^10.1.0",
+        "uuid": "^13.0.0"
     },
     "devDependencies": {
         "@jest/globals": "^29.2.0",
