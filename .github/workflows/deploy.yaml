@@ -10,6 +10,9 @@ jobs:
         runs-on: ubuntu-latest # Uses a fresh Ubuntu virtual machine
 
         steps:
+            - name: Install esbuild globally
+              run: npm install -g esbuild
+              
             - name: Checkout Code
               uses: actions/checkout@v3 # Clones the repository content
 
@@ -29,9 +32,6 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ secrets.AWS_REGION }}
 
-            - name: Install esbuild globally
-              run: npm install -g esbuild
-
             - name: Install dependencies and run tests
               run: |
                   npm install
@@ -42,7 +42,6 @@ jobs:
 
             - name: Deploy SAM Application
               run: |
-                  # The 'resolve_s3: True' in samconfig.toml handles the artifact bucket automatically
                   sam deploy \
                     --stack-name ads-api-dev \
                     --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
