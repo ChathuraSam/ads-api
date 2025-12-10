@@ -56,3 +56,4 @@ dev:
             parameter_overrides:
                 - Region=us-east-1
                 - Env=dev
+                - AdsTableName=AdsTableDev

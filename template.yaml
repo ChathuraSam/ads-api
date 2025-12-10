@@ -16,11 +16,15 @@ Globals:
         Environment:
             Variables:
                 Env: !Ref Env
+                AdsTableName: !Ref AdsTableName
 
 Parameters:
     Env:
         Type: String
         Default: dev
+    AdsTableName:
+        Type: String
+        Default: AdsTable-dev
 
 Resources:
     HelloWorldFunction:
@@ -67,6 +71,18 @@ Resources:
                 Sourcemap: true
                 EntryPoints:
                     - handler.ts
+
+    AdsTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            TableName: !Ref AdsTableName
+            AttributeDefinition:
+                - AttributeName: id
+                  AttributeType: S
+            KeySchema:
+                - AttributeName: id
+                  KeyType: HASH
+            BillingMode: PAY_PER_REQUEST
 
 Outputs:
     # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
