@@ -28,7 +28,28 @@ Windows PowerShell
 ```
 
 
+# run the LocalStack (Full Local AWS simulation)
+docker run -d -p 4566:4566 --name localstack localstack/localstack
+aws --endpoint-url=http://localhost:4566 s3 mb s3://ads-api-dev-bucket-686255957557
+
+# Create SNS topic in LocalStack
+aws --endpoint-url=http://localhost:4566 sns create-topic --name ads-notifications-dev --region us-east-1
+
+# Subscribe to SNS topic (optional, for testing)
+aws --endpoint-url=http://localhost:4566 sns subscribe \
+    --topic-arn arn:aws:sns:us-east-1:000000000000:ads-notifications-dev \
+    --protocol email \
+    --notification-endpoint your-email@example.com \
+    --region us-east-1
+
+
+
 # a sample ads record postman request body
+
+to create the base64 image,
+
+https://codebeautify.org/image-to-base64-converter
+
 ```
 {
     "title": "asdasd",
@@ -37,3 +58,32 @@ Windows PowerShell
 }
 ```
 
+# authenticating the APIs.
+curl --location 'https://cognito-idp.us-east-1.amazonaws.com/' \
+--header 'Content-Type: application/x-amz-json-1.1' \
+--header 'X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth' \
+--data '{
+    "AuthFlow": "USER_PASSWORD_AUTH",
+    "ClientId": "YOUR_CLIENT_ID_HERE",
+    "AuthParameters": {
+        "USERNAME": "test@example.com",
+        "PASSWORD": "MyPassword123!"
+    }
+}'
+
+If you run this for the first time, you need update your password. So, run this PI also
+
+curl --location 'https://cognito-idp.us-east-1.amazonaws.com/' \
+--header 'Content-Type: application/x-amz-json-1.1' \
+--header 'X-Amz-Target: AWSCognitoIdentityProviderService.RespondToAuthChallenge' \
+--data '{
+    "ChallengeName": "NEW_PASSWORD_REQUIRED",
+    "ClientId": "YOUR_CLIENT_ID_HERE",
+    "ChallengeResponses": {
+        "USERNAME": "test@example.com",
+        "NEW_PASSWORD": "MyNewPassword123!"
+    },
+    "Session": "<session token>"
+}'
+
+To get the token, run the first CURL and you;ll get the IdToken
