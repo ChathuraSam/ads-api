@@ -59,6 +59,9 @@ Resources:
             FunctionName: !Sub '${AppCode}-${Env}-create-ad'
             CodeUri: src/functions/ads/
             Handler: handler.lambdaHandler
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref AdsTable
             Runtime: nodejs22.x
             Architectures:
                 - x86_64
