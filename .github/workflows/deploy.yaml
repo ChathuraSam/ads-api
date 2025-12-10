@@ -38,14 +38,15 @@ jobs:
                   npm test # Optional: Runs your project's tests
 
             - name: Build SAM Application
-              run: sam build --use-container # Builds the serverless application
+              run: sam build # Builds the serverless application without container
 
             - name: Deploy SAM Application
               run: |
                   # The 'resolve_s3: True' in samconfig.toml handles the artifact bucket automatically
                   sam deploy \
                     --stack-name ads-api-dev \
-                    --capabilities CAPABILITY_IAM \
+                    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
                     --region ${{ secrets.AWS_REGION }} \
                     --no-confirm-changeset \
-                    --no-fail-on-empty-changeset
+                    --no-fail-on-empty-changeset \
+                    --resolve-s3
