@@ -48,7 +48,8 @@ local:
                 - Region=us-east-1
                 - Env=local
     local_invoke:
-        parameters: env_vars = "env.vars-dev.json"
+        parameters:
+            env_vars: 'env.vars-dev.json'
 
 dev:
     deploy:

@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
-import { ADS_TABLE_NAME, ADS_TOPIC_ARN, ADS_TOPIC_NAME, ENV } from '../../libs/constants';
+import { ADS_TABLE_NAME, ADS_TOPIC_ARN, ADS_TOPIC_NAME } from '../../libs/constants';
 import createLogger from '../../libs/logger';
 import { createItem } from '../../services/dynamodb-service';
 import { uploadBase64Image } from '../../services/s3-service';
@@ -19,7 +19,19 @@ import { publishMessage } from '../../services/sns-service';
 const logger = createLogger('create-ads');
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const { title, price, imageBase64 } = JSON.parse(event.body || '{}');
+    let body: any;
+
+    try {
+        body = JSON.parse(event.body || '{}');
+    } catch (error) {
+        logger.error({ error }, 'Invalid JSON in request body');
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: 'Invalid JSON in request body' }),
+        };
+    }
+
+    const { title, price, imageBase64 } = body;
     logger.info({ title, price }, 'received event');
     try {
         if (!title || !price) {
@@ -29,11 +41,18 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             };
         }
 
+        if (typeof price !== 'number' || price <= 0) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Invalid data types for price' }),
+            };
+        }
+
         const id = uuidv4();
         const dateTime = new Date().toISOString();
         let imageUrl: string | null = null;
 
-        // write the image upload code
+        // TODO: Missing input validation for imageBase64. The code should validate that the base64 string is properly formatted and has a reasonable size limit before attempting to decode and upload. Large or malformed base64 strings could cause memory issues or errors during Buffer conversion.
         if (imageBase64) {
             imageUrl = await uploadBase64Image(id, imageBase64);
         }
