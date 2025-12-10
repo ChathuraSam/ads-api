@@ -25,11 +25,15 @@ Parameters:
     AdsTableName:
         Type: String
         Default: AdsTable-dev
+    AppCode:
+        Type: String
+        Default: ads-api
 
 Resources:
     HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
+            FunctionName: !Sub '${AppCode}-${Env}-hello-world'
             CodeUri: src/functions/hello-world/
             Handler: handler.lambdaHandler
             Runtime: nodejs22.x
@@ -52,6 +56,7 @@ Resources:
     AdsFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
+            FunctionName: !Sub '${AppCode}-${Env}-create-ad'
             CodeUri: src/functions/ads/
             Handler: handler.lambdaHandler
             Runtime: nodejs22.x
