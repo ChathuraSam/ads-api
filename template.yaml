@@ -18,6 +18,8 @@ Globals:
                 Env: !Ref Env
                 AdsTableName: !Ref AdsTableName
                 AdsBucketName: !Sub '${AppCode}-${Env}-bucket-${AWS::AccountId}'
+                AdsTopicName: !Ref AdsTopicName
+                AdsTopicArn: !Ref AdsTopicArn
 
 Parameters:
     Env:
@@ -30,6 +32,11 @@ Parameters:
         Type: String
         Default: ads-api
     AdsBucketName:
+        Type: String
+    AdsTopicName:
+        Type: String
+        Default: ads-api-dev-notifications
+    AdsTopicArn:
         Type: String
 
 Resources:
@@ -101,6 +108,12 @@ Resources:
         Properties:
             BucketName: !Sub '${AppCode}-${Env}-bucket-${AWS::AccountId}'
 
+    # SNS Topic
+    AdsTopic:
+        Type: AWS::SNS::Topic
+        Properties:
+            TopicName: !Ref AdsTopicName
+
     # IAM Role
     AdsFunctionRole:
         Type: AWS::IAM::Role
@@ -139,6 +152,14 @@ Resources:
                                 - s3:GetObject
                                 - s3:DeleteObject
                             Resource: !Sub '${AdsBucket.Arn}/*'
+                - PolicyName: SNSPublishAccess
+                  PolicyDocument:
+                      Version: '2012-10-17'
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - sns:Publish
+                            Resource: !Ref AdsTopic
 
 Outputs:
     # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

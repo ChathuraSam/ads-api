@@ -1,9 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
-import { ADS_TABLE_NAME, ENV } from '../../libs/constants';
+import { ADS_TABLE_NAME, ADS_TOPIC_ARN, ADS_TOPIC_NAME, ENV } from '../../libs/constants';
 import createLogger from '../../libs/logger';
 import { createItem } from '../../services/dynamodb-service';
 import { uploadBase64Image } from '../../services/s3-service';
+import { publishMessage } from '../../services/sns-service';
 
 /**
  *
@@ -46,7 +47,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         };
 
         await createItem(ADS_TABLE_NAME, item);
-
+        await publishMessage(ADS_TOPIC_ARN, item);
         return {
             statusCode: 201,
             body: JSON.stringify({ message: 'Ad created', item }),

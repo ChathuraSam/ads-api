@@ -63,3 +63,5 @@ dev:
                 - Env=dev
                 - AdsTableName=AdsTable-dev
                 - AdsBucketName=ads-api-dev-bucket-686255957557
+                - AdsTopicName=ads-api-dev-notifications
+                - AdsTopicArn=arn:aws:sns:us-east-1:686255957557:ads-api-dev-notifications
