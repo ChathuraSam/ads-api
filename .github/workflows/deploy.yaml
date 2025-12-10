@@ -1,0 +1,48 @@
+name: Deploy API to AWS CloudFormation (IAM User)
+
+on:
+    push:
+        branches:
+            - main # Triggers the workflow on pushes to the main branch
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest # Uses a fresh Ubuntu virtual machine
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v3 # Clones the repository content
+
+            - name: Setup Node.js environment
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22.x' # Use the Node.js version appropriate for your project
+
+            - name: Install AWS SAM CLI
+              uses: aws-actions/setup-sam@v2 # Installs the AWS SAM CLI on the runner
+
+            - name: Configure AWS Credentials
+              # This action uses the secrets to configure the AWS CLI environment
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Install dependencies and run tests
+              run: |
+                  npm install
+                  npm test # Optional: Runs your project's tests
+
+            - name: Build SAM Application
+              run: sam build --use-container # Builds the serverless application
+
+            - name: Deploy SAM Application
+              run: |
+                  # The 'resolve_s3: True' in samconfig.toml handles the artifact bucket automatically
+                  sam deploy \
+                    --stack-name ads-api-dev \
+                    --capabilities CAPABILITY_IAM \
+                    --region ${{ secrets.AWS_REGION }} \
+                    --no-confirm-changeset \
+                    --no-fail-on-empty-changeset
