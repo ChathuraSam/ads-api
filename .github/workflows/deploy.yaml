@@ -29,6 +29,9 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ secrets.AWS_REGION }}
 
+            - name: Install esbuild globally
+              run: npm install -g esbuild
+
             - name: Install dependencies and run tests
               run: |
                   npm install
