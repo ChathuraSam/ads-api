@@ -54,7 +54,7 @@ dev:
     deploy:
         parameters:
             stack_name: ads-api-dev
-            capabilities: CAPABILITY_IAM
+            capabilities: CAPABILITY_IAM CAPABILITY_NAMED_IAM
             confirm_changeset: true
             resolve_s3: true
             region: us-east-1
@@ -62,3 +62,4 @@ dev:
                 - Region=us-east-1
                 - Env=dev
                 - AdsTableName=AdsTable-dev
+                - AdsBucketName=ads-api-dev-bucket-686255957557

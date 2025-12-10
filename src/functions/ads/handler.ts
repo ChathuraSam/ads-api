@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ADS_TABLE_NAME, ENV } from '../../libs/constants';
 import createLogger from '../../libs/logger';
 import { createItem } from '../../services/dynamodb-service';
+import { uploadBase64Image } from '../../services/s3-service';
 
 /**
  *
@@ -17,10 +18,9 @@ import { createItem } from '../../services/dynamodb-service';
 const logger = createLogger('create-ads');
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info({ event }, 'received event');
+    const { title, price, imageBase64 } = JSON.parse(event.body || '{}');
+    logger.info({ title, price }, 'received event');
     try {
-        const { title, price, imageBase64 } = JSON.parse(event.body || '{}');
-
         if (!title || !price) {
             return {
                 statusCode: 400,
@@ -30,14 +30,18 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
 
         const id = uuidv4();
         const dateTime = new Date().toISOString();
+        let imageUrl: string | null = null;
 
         // write the image upload code
+        if (imageBase64) {
+            imageUrl = await uploadBase64Image(id, imageBase64);
+        }
 
         const item = {
             id,
             title,
             price,
-            // imageUrl,
+            imageUrl,
             createdAt: dateTime,
         };
 

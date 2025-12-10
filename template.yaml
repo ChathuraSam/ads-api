@@ -17,6 +17,7 @@ Globals:
             Variables:
                 Env: !Ref Env
                 AdsTableName: !Ref AdsTableName
+                AdsBucketName: !Sub '${AppCode}-${Env}-bucket-${AWS::AccountId}'
 
 Parameters:
     Env:
@@ -28,6 +29,8 @@ Parameters:
     AppCode:
         Type: String
         Default: ads-api
+    AdsBucketName:
+        Type: String
 
 Resources:
     # Lambda
@@ -60,9 +63,7 @@ Resources:
             FunctionName: !Sub '${AppCode}-${Env}-create-ad'
             CodeUri: src/functions/ads/
             Handler: handler.lambdaHandler
-            Policies:
-                - DynamoDBCrudPolicy:
-                      TableName: !Ref AdsTable
+            Role: !GetAtt AdsFunctionRole.Arn
             Runtime: nodejs22.x
             Architectures:
                 - x86_64
@@ -72,8 +73,6 @@ Resources:
                     Properties:
                         Path: /ads
                         Method: post
-                        Auth:
-                            Authorizer: AWS_IAM
         Metadata: # Manage esbuild properties
             BuildMethod: esbuild
             BuildProperties:
@@ -95,6 +94,51 @@ Resources:
                 - AttributeName: id
                   KeyType: HASH
             BillingMode: PAY_PER_REQUEST
+
+    # S3 Bucket
+    AdsBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: !Sub '${AppCode}-${Env}-bucket-${AWS::AccountId}'
+
+    # IAM Role
+    AdsFunctionRole:
+        Type: AWS::IAM::Role
+        Properties:
+            RoleName: !Sub '${AppCode}-${Env}-ads-function-role'
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service: lambda.amazonaws.com
+                      Action: sts:AssumeRole
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+            Policies:
+                - PolicyName: DynamoDBAccess
+                  PolicyDocument:
+                      Version: '2012-10-17'
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - dynamodb:PutItem
+                                - dynamodb:GetItem
+                                - dynamodb:UpdateItem
+                                - dynamodb:DeleteItem
+                                - dynamodb:Query
+                                - dynamodb:Scan
+                            Resource: !GetAtt AdsTable.Arn
+                - PolicyName: S3Access
+                  PolicyDocument:
+                      Version: '2012-10-17'
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - s3:PutObject
+                                - s3:GetObject
+                                - s3:DeleteObject
+                            Resource: !Sub '${AdsBucket.Arn}/*'
 
 Outputs:
     # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
