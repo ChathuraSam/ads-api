@@ -1,4 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { ENV } from '../../libs/constants';
+import createLogger from '../../libs/logger';
 
 /**
  *
@@ -10,12 +12,15 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
  *
  */
 
+const logger = createLogger('hello-world');
+
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    logger.info({ event }, 'received event');
     try {
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: 'hello world',
+                message: `hello world running in ${ENV}`,
             }),
         };
     } catch (err) {

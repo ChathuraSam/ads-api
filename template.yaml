@@ -8,17 +8,45 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
     Function:
-        Timeout: 3
+        Timeout: 60
 
         # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
         LoggingConfig:
             LogFormat: JSON
+        Environment:
+            Variables:
+                Env: !Ref Env
+                AdsTableName: !Ref AdsTableName
+                AdsBucketName: !Sub '${AppCode}-${Env}-bucket-${AWS::AccountId}'
+                AdsTopicName: !Ref AdsTopicName
+                AdsTopicArn: !Ref AdsTopicArn
+
+Parameters:
+    Env:
+        Type: String
+        Default: dev
+    AdsTableName:
+        Type: String
+        Default: AdsTable-dev
+    AppCode:
+        Type: String
+        Default: ads-api
+    AdsBucketName:
+        Type: String
+    AdsTopicName:
+        Type: String
+        Default: ads-api-dev-notifications
+    AdsTopicArn:
+        Type: String
+
 Resources:
+    # Lambda
     HelloWorldFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
+            FunctionName: !Sub '${AppCode}-${Env}-hello-world'
             CodeUri: src/functions/hello-world/
-            Handler: app.lambdaHandler
+            Handler: handler.lambdaHandler
             Runtime: nodejs22.x
             Architectures:
                 - x86_64
@@ -36,6 +64,102 @@ Resources:
                 Sourcemap: true
                 EntryPoints:
                     - handler.ts
+    AdsFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            FunctionName: !Sub '${AppCode}-${Env}-create-ad'
+            CodeUri: src/functions/ads/
+            Handler: handler.lambdaHandler
+            Role: !GetAtt AdsFunctionRole.Arn
+            Runtime: nodejs22.x
+            Architectures:
+                - x86_64
+            Events:
+                CreateAdApi:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        Path: /ads
+                        Method: post
+        Metadata: # Manage esbuild properties
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: es2020
+                Sourcemap: true
+                EntryPoints:
+                    - handler.ts
+
+    # DynamoDB
+    AdsTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            TableName: !Ref AdsTableName
+            AttributeDefinitions:
+                - AttributeName: id
+                  AttributeType: S
+            KeySchema:
+                - AttributeName: id
+                  KeyType: HASH
+            BillingMode: PAY_PER_REQUEST
+
+    # S3 Bucket
+    AdsBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: !Sub '${AppCode}-${Env}-bucket-${AWS::AccountId}'
+
+    # SNS Topic
+    AdsTopic:
+        Type: AWS::SNS::Topic
+        Properties:
+            TopicName: !Ref AdsTopicName
+
+    # IAM Role
+    AdsFunctionRole:
+        Type: AWS::IAM::Role
+        Properties:
+            RoleName: !Sub '${AppCode}-${Env}-ads-function-role'
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service: lambda.amazonaws.com
+                      Action: sts:AssumeRole
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+            Policies:
+                - PolicyName: DynamoDBAccess
+                  PolicyDocument:
+                      Version: '2012-10-17'
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - dynamodb:PutItem
+                                - dynamodb:GetItem
+                                - dynamodb:UpdateItem
+                                - dynamodb:DeleteItem
+                                - dynamodb:Query
+                                - dynamodb:Scan
+                            Resource: !GetAtt AdsTable.Arn
+                - PolicyName: S3Access
+                  PolicyDocument:
+                      Version: '2012-10-17'
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - s3:PutObject
+                                - s3:GetObject
+                                - s3:DeleteObject
+                            Resource: !Sub '${AdsBucket.Arn}/*'
+                - PolicyName: SNSPublishAccess
+                  PolicyDocument:
+                      Version: '2012-10-17'
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - sns:Publish
+                            Resource: !Ref AdsTopic
 
 Outputs:
     # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
