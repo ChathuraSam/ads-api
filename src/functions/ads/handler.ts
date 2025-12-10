@@ -12,15 +12,17 @@ import createLogger from '../../libs/logger';
  *
  */
 
-const logger = createLogger('hello-world');
+const logger = createLogger('create-ads');
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info({ event }, 'received event');
+    const { title, description } = JSON.parse(event.body || '{}');
+    logger.info({ title, description }, 'ad data');
     try {
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: `hello world running in ${ENV}`,
+                message: `running ads API in ${ENV}`,
             }),
         };
     } catch (err) {
