@@ -1,6 +1,6 @@
 # Ads API – AWS Serverless (Node.js + TypeScript)
 
-## 📌 Overview
+## Overview
 
 This project implements a fully serverless **Ads API** using **AWS Lambda**, **API Gateway**, **DynamoDB**, **S3**, **SNS**, **Cognito (mocked locally)**, **TypeScript**, and **AWS SAM**.
 
@@ -16,7 +16,7 @@ This repository includes:
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 * **AWS Lambda** – Compute
 * **API Gateway** – REST API exposure
@@ -30,7 +30,7 @@ This repository includes:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 ads-api/
@@ -66,9 +66,9 @@ ads-api/
 
 ---
 
-## 🚀 Features
+## Features
 
-### ✔ Create an Ad
+### Create an Ad
 
 `POST /ads` allows creating:
 
@@ -76,7 +76,7 @@ ads-api/
 * **price** (number)
 * **imageBase64** (optional base64 image)
 
-### ✔ Optional Image Upload to S3
+### Optional Image Upload to S3
 
 If `imageBase64` is provided:
 
@@ -84,7 +84,7 @@ If `imageBase64` is provided:
 2. Uploaded to S3 bucket under `ads/{id}.jpg`
 3. Public S3 URL returned in response
 
-### ✔ SNS Notification on Ad Creation
+### SNS Notification on Ad Creation
 
 Each successful ad creation publishes an event to SNS containing:
 
@@ -94,7 +94,7 @@ Each successful ad creation publishes an event to SNS containing:
 * Image URL
 * Timestamp
 
-### ✔ DynamoDB Storage
+### DynamoDB Storage
 
 Ads are stored in a table with structure:
 
@@ -108,7 +108,7 @@ Additional data includes:
 * createdAt
 * imageUrl
 
-### ✔ Structured Logging
+### Structured Logging
 
 Every request includes structured logs with:
 
@@ -118,9 +118,9 @@ Every request includes structured logs with:
 
 ---
 
-## 🔐 Authentication
+## Authentication
 
-### ✔ Production – Cognito User Pool
+### Production – Cognito User Pool
 
 If deployed, API Gateway validates JWT tokens from Cognito.
 User identity available as:
@@ -131,7 +131,7 @@ event.requestContext.authorizer.claims.sub
 
 ---
 
-### ✔ Local Development – Cognito Mock (Allowed)
+### Local Development – Cognito Mock (Allowed)
 
 The assignment explicitly permits mocking Cognito locally.
 
@@ -154,7 +154,7 @@ const userId =
 
 ---
 
-## 🧪 Running Locally with SAM
+## Running Locally with SAM
 
 ### 1. Install dependencies
 
@@ -197,7 +197,7 @@ Body example:
 
 ---
 
-## 📝 Unit Testing
+## Unit Testing
 
 Run tests:
 
@@ -213,7 +213,7 @@ Tests include:
 
 ---
 
-## 🤖 CI/CD – GitHub Actions
+## CI/CD – GitHub Actions
 
 Workflow includes:
 
@@ -230,7 +230,7 @@ Located in:
 
 ---
 
-## ☁️ Deployment
+## Deployment
 
 ```
 npm run deploy-dev
@@ -247,7 +247,7 @@ SAM will create:
 
 ---
 
-## 📬 Verifying SNS Messages
+## Verifying SNS Messages
 
 You can confirm SNS works by **subscribing your email**:
 
@@ -260,7 +260,21 @@ You will receive the message JSON.
 
 ---
 
-## 📘 Notes
+## POSTMAN setup and run the APIs
+I have deploy the SAM stack to my personal AWS account.
+
+base URL: https://ahypjsl53j.execute-api.us-east-1.amazonaws.com/Prod
+
+Go to Postman and import the file in this repository
+```
+api.postman_collection.json
+```
+
+add the base URL to environment and invoke the API
+
+
+
+## Notes
 
 This project implements >80% of the required functionality and follows best practices in:
 
@@ -273,12 +287,12 @@ This project implements >80% of the required functionality and follows best prac
 
 ---
 
-## 👤 Author
+## Author
 
 Developed by Chathura as part of an AWS Serverless coding assessment.
 
 ---
 
-## 📎 License
+## License
 
 MIT License
