@@ -1,3 +1,9 @@
+# first you have to install
+esbuild in host machine. Globally
+```
+npm i esbuild -g
+```
+
 # create the local dyanamobd
 (later I will add this to a docker file)
 
@@ -11,21 +17,8 @@ aws dynamodb create-table \                                               ─╯
 
 
 # convert image to base 64
-mac-os
-```
-base64 myimage.jpg > output.txt
-```
-
-linux
-```
-base64 myimage.jpg > output.txt
-```
-
-Windows PowerShell
-```
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("myimage.jpg")) | Out-File output.txt
-
-```
+Go to this website and upload your image. Then copy the converted base64 code
+https://codebeautify.org/image-to-base64-converter
 
 
 # run the LocalStack (Full Local AWS simulation)
@@ -50,6 +43,7 @@ to create the base64 image,
 
 https://codebeautify.org/image-to-base64-converter
 
+A sample request body for /ads API
 ```
 {
     "title": "asdasd",
@@ -71,7 +65,7 @@ curl --location 'https://cognito-idp.us-east-1.amazonaws.com/' \
     }
 }'
 
-If you run this for the first time, you need update your password. So, run this API also
+If you run this for the first time, you need update your password. So, run this API first to reset the password
 
 curl --location 'https://cognito-idp.us-east-1.amazonaws.com/' \
 --header 'Content-Type: application/x-amz-json-1.1' \
@@ -86,38 +80,4 @@ curl --location 'https://cognito-idp.us-east-1.amazonaws.com/' \
     "Session": "<session token>"
 }'
 
-To get the authentication token, run the first CURL and you'll get the IdToken
-
-
-In Postman:
-For the /hello endpoint (protected):
-Request Setup:
-
-Method: GET
-URL: https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/Prod/hello
-Authorization Tab:
-
-Type: Select "Bearer Token"
-Token: Paste the IdToken you got from the CLI command above
-Click Send
-
-request body:
-```
-{
-    "title": "Test Ad",
-    "price": 100,
-    "imageBase64": "your-base64-string-here"
-}
-```
-
-Authorization:
-```
-Auth Type: Bearer Token
-Copy ansd paste the IdToken got by running the cognito user API
-```
-
-I have created a test user in the cognito user pool. You can use that user for the authorization.
-```
-username: test-user@test.com
-password: TestUser1
-```
+To get the token, run the first CURL and you'll get the IdToken
