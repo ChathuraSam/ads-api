@@ -300,7 +300,7 @@ paste the IdToken in to there and execute the API.
 
 ## Notes
 
-This project implements >80% of the required functionality and follows best practices in:
+This project implements all the required functionality and follows best practices in:
 
 * TypeScript
 * AWS Serverless
