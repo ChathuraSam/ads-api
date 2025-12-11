@@ -260,6 +260,12 @@ You will receive the message JSON.
 
 ---
 
+## Known Limitations
+
+Images stored as JPG
+
+No input sanitization beyond required fields
+
 ## POSTMAN setup and run the APIs
 I have deploy the SAM stack to my personal AWS account.
 
