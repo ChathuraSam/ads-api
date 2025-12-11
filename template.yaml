@@ -88,6 +88,8 @@ Resources:
                     Properties:
                         Path: /ads
                         Method: post
+                        Auth:
+                            Authorizer: CognitoAuthorizer
         Metadata: # Manage esbuild properties
             BuildMethod: esbuild
             BuildProperties:
