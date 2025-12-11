@@ -3,29 +3,28 @@ name: Deploy API to AWS CloudFormation (IAM User)
 on:
     push:
         branches:
-            - main # Triggers the workflow on pushes to the main branch
+            - main
 
 jobs:
     deploy:
-        runs-on: ubuntu-latest # Uses a fresh Ubuntu virtual machine
+        runs-on: ubuntu-latest
 
         steps:
             - name: Install esbuild globally
               run: npm install -g esbuild
-              
+
             - name: Checkout Code
-              uses: actions/checkout@v3 # Clones the repository content
+              uses: actions/checkout@v3
 
             - name: Setup Node.js environment
               uses: actions/setup-node@v4
               with:
-                  node-version: '22.x' # Use the Node.js version appropriate for your project
+                  node-version: '22.x'
 
             - name: Install AWS SAM CLI
-              uses: aws-actions/setup-sam@v2 # Installs the AWS SAM CLI on the runner
+              uses: aws-actions/setup-sam@v2
 
             - name: Configure AWS Credentials
-              # This action uses the secrets to configure the AWS CLI environment
               uses: aws-actions/configure-aws-credentials@v4
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -38,7 +37,7 @@ jobs:
                   npm test # Optional: Runs your project's tests
 
             - name: Build SAM Application
-              run: sam build # Builds the serverless application without container
+              run: sam build
 
             - name: Deploy SAM Application
               run: |
