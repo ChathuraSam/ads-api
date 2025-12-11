@@ -16,6 +16,8 @@ const logger = createLogger('create-ads');
  */
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     let body: any;
+    const userId = event.requestContext.authorizer?.claims?.sub || event.headers['X-User-Id'] || 'anonymous';
+    logger.info({ userId }, 'Creating ad for user');
 
     try {
         body = JSON.parse(event.body || '{}');
@@ -53,7 +55,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         }
 
         const item = {
-            id,
+            id: `${userId}#${id}`,
             title,
             price,
             imageUrl,
