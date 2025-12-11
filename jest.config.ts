@@ -4,12 +4,22 @@
  */
 
 export default {
+    preset: 'ts-jest',
+    testEnvironment: 'node',
     transform: {
-        '^.+\\.ts?$': 'ts-jest',
+        '^.+\\.ts?$': [
+            'ts-jest',
+            {
+                useESM: false,
+            },
+        ],
     },
     clearMocks: true,
     collectCoverage: true,
     coverageDirectory: 'coverage',
     coverageProvider: 'v8',
     testMatch: ['**/tests/unit/*.test.ts'],
+    moduleNameMapper: {
+        '^uuid$': require.resolve('uuid'),
+    },
 };
