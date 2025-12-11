@@ -273,6 +273,30 @@ api.postman_collection.json
 add the base URL to environment and invoke the API
 
 
+Let's get the Bearer Token first,
+
+I have created a test user
+Run the Authenticate API to get the IdToken
+
+```
+Authenticate(POST): https://cognito-idp.us-east-1.amazonaws.com/
+
+{
+    "AuthFlow": "USER_PASSWORD_AUTH",
+    "ClientId": "7ekff3d2508hkva3cfcf22juf5",
+    "AuthParameters": {
+        "USERNAME": "testuser2@test.com",
+        "PASSWORD": "TestUser1"
+    }
+}
+```
+
+copy the IdToken(valid for 1 hour)
+
+/ads API needs to add a Authorization(Bearer token)
+paste the IdToken in to there and execute the API.
+
+
 
 ## Notes
 
