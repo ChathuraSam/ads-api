@@ -5,7 +5,7 @@ version: 0.1
 default:
     global:
         parameters:
-            stack_name: ads-api
+            stack_name: ads-api-v2
 
     build:
         parameters:
@@ -45,7 +45,6 @@ local:
     build:
         parameters:
             parameter_overrides:
-                - Region=us-east-1
                 - Env=local
     local_invoke:
         parameters:
@@ -60,9 +59,6 @@ dev:
             resolve_s3: true
             region: us-east-1
             parameter_overrides:
-                - Region=us-east-1
-                - Env=dev
+                - Env=prod
                 - AdsTableName=AdsTable-dev
-                - AdsBucketName=ads-api-dev-bucket-686255957557
                 - AdsTopicName=ads-api-dev-notifications
-                - AdsTopicArn=arn:aws:sns:us-east-1:686255957557:ads-api-dev-notifications

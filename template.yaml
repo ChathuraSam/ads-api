@@ -17,7 +17,7 @@ Globals:
                 AdsTableName: !Ref AdsTableName
                 AdsBucketName: !Sub '${AppCode}-${Env}-bucket-${AWS::AccountId}'
                 AdsTopicName: !Ref AdsTopicName
-                AdsTopicArn: !Ref AdsTopicArn
+                AdsTopicArn: !Ref AdsTopic
     Api:
         Auth:
             Authorizers:
@@ -34,13 +34,9 @@ Parameters:
     AppCode:
         Type: String
         Default: ads-api
-    AdsBucketName:
-        Type: String
     AdsTopicName:
         Type: String
         Default: ads-api-dev-notifications
-    AdsTopicArn:
-        Type: String
 
 Resources:
     # Lambda
