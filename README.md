@@ -99,12 +99,13 @@ Each successful ad creation publishes an event to SNS containing:
 Ads are stored in a table with structure:
 
 ```
-Partition Key: id (string)
+Partition Key: id (string) - Format: userId#adId
 ```
 
 Additional data includes:
 
-* userId
+* title
+* price
 * createdAt
 * imageUrl
 
@@ -182,7 +183,7 @@ Headers:
 
 ```
 Content-Type: application/json
-x-user-id: test-user
+X-User-Id: test-user
 ```
 
 Body example:
